@@ -82,10 +82,10 @@ jobs:
 
       - name: Build FastAPI Docker image
         run: |
-          pip install -r src\api\requirements.txt
+          pip install -r src/api/requirements.txt
           docker build -t house-price-api:ci -f Dockerfile .
 
       - name: Build Streamlit Docker image
         run: |
-          pip install -r streamlit_app\requirements.txt
+          pip install -r streamlit_app/requirements.txt
           docker build -t house-price-streamlit:ci -f streamlit_app/Dockerfile .

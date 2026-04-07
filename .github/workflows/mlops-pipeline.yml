@@ -1,0 +1,84 @@
+name: MLOps Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.15"
+          # cache: pip
+          # cache-dependency-path: |
+          #   requirements.txt
+          #   src/api/requirements.txt
+          #   streamlit_app/requirements.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install nbconvert nbclient jupyter
+
+      - name: Run feature engineering
+        run: |
+          python src/features/engineer.py \
+            --input data/raw/house_data.csv \
+            --output data/processed/featured_house_data.csv \
+            --preprocessor models/trained/preprocessor.pkl
+
+      - name: Start MLflow tracking server
+        run: docker run -d -p 5555:5000 --name mlflow-server ghcr.io/mlflow/mlflow:latest \
+          mlflow server --host 0.0.0.0 \
+          --backend-store-uri sqlite:///mlflow.db \
+          --default-artifact-root /tmp/mlruns
+          #|
+          # nohup mlflow server \
+          #   --backend-store-uri sqlite:///mlflow.db \
+          #   --default-artifact-root ./mlruns \
+          #   --host 127.0.0.1 \
+          #   --port 5555 > mlflow.log 2>&1 &
+
+          # for i in {1..30}; do
+          #   if curl -fsS http://127.0.0.1:5555 >/dev/null; then
+          #     echo "MLflow server is ready"
+          #     exit 0
+          #   fi
+          #   sleep 2
+          # done
+
+          # echo "MLflow server did not start in time"
+          # cat mlflow.log
+          # exit 1
+
+      - name: Execute experimentation notebook
+        run: |
+          jupyter nbconvert \
+            --execute notebooks/03_experimentation.ipynb \
+            --output 03_experimentation.executed.ipynb \
+            --ExecutePreprocessor.timeout=3600
+
+      - name: Train model script
+        run: |
+          python src/models/train_model.py \
+            --config configs/model_config.yaml \
+            --data data/processed/featured_house_data.csv \
+            --models-dir models \
+            --mlflow-tracking-uri http://localhost:5555
+
+      - name: Build FastAPI Docker image
+        run: docker build -t house-price-api:ci -f Dockerfile .
+
+      - name: Build Streamlit Docker image
+        run: docker build -t house-price-streamlit:ci -f streamlit_app/Dockerfile .

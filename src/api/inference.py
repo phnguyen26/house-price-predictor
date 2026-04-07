@@ -1,12 +1,13 @@
 import joblib
 import pandas as pd
+import yaml
 from datetime import datetime
 from schemas import HousePredictionRequest, PredictionResponse
 
 # Load model and preprocessor
 MODEL_PATH = "models/trained/house_price_model.pkl"
 PREPROCESSOR_PATH = "models/trained/preprocessor.pkl"
-
+model_config = yaml.safe_load(open("config/model_config.yaml"))
 try:
     model = joblib.load(MODEL_PATH)
     preprocessor = joblib.load(PREPROCESSOR_PATH)
@@ -42,7 +43,9 @@ def predict_price(request: HousePredictionRequest) -> PredictionResponse:
         predicted_price=predicted_price,
         confidence_interval=confidence_interval,
         features_importance={},
-        prediction_time=datetime.now().isoformat()
+        prediction_time=datetime.now().isoformat(),
+        model_used=model_config.get("best_model"),
+        r2_score=model_config.get("r2_score")
     )
 
 def batch_predict(requests: list[HousePredictionRequest]) -> list[float]:

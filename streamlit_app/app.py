@@ -47,7 +47,7 @@ with col1:
 
     # Location dropdown
     st.markdown("<p><strong>Location</strong></p>", unsafe_allow_html=True)
-    location = st.selectbox("", options=["Urban", "Suburban", "Rural", "Urban", "Waterfront", "Mountain"], index=1, label_visibility="collapsed")
+    location = st.selectbox("", options=["Urban", "Suburban", "Downtown","Rural", "Urban", "Waterfront", "Mountain"], index=1, label_visibility="collapsed")
 
     # Year Built slider
     st.markdown(f"<p><strong>Year Built:</strong> <span id='year-value'></span></p>", unsafe_allow_html=True)
@@ -73,14 +73,14 @@ with col2:
                 "sqft": sqft,
                 "bedrooms": bedrooms,
                 "bathrooms": bathrooms,
-                "location": location.lower(),
+                "location": location,
                 "year_built": year_built,
                 "condition": "Good"
             }
 
             try:
                 # Get API endpoint from environment variable or use default
-                api_endpoint = os.getenv("API_URL", "http://model:8000")
+                api_endpoint = os.getenv("API_URL", "http://localhost:8000")
                 predict_url = f"{api_endpoint.rstrip('/')}/predict"
 
                 st.write(f"Connecting to API at: {predict_url}")
@@ -121,14 +121,14 @@ with col2:
         col_a, col_b = st.columns(2)
         with col_a:
             st.markdown('<div class="info-card">', unsafe_allow_html=True)
-            st.markdown('<p class="info-label">Confidence Score</p>', unsafe_allow_html=True)
-            st.markdown('<p class="info-value">92%</p>', unsafe_allow_html=True)
+            st.markdown('<p class="info-label">r2_score</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="info-value">{pred["r2_score"]}</p>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
         with col_b:
             st.markdown('<div class="info-card">', unsafe_allow_html=True)
             st.markdown('<p class="info-label">Model Used</p>', unsafe_allow_html=True)
-            st.markdown('<p class="info-value">XGBoost</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="info-value">{pred["model_used"]}</p>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
         # Display price range and prediction time
@@ -144,7 +144,7 @@ with col2:
         with col_d:
             st.markdown('<div class="info-card">', unsafe_allow_html=True)
             st.markdown('<p class="info-label">Prediction Time</p>', unsafe_allow_html=True)
-            st.markdown('<p class="info-value">0.12 seconds</p>', unsafe_allow_html=True)
+            st.markdown('<p class="info-value">0.12 seconds (place holder)</p>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
         # Top factors

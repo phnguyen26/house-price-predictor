@@ -67,6 +67,7 @@ jobs:
       - name: Execute experimentation notebook
         run: |
           jupyter nbconvert \
+            -- to notebook \
             --execute notebooks/03_experimentation.ipynb \
             --output 03_experimentation.executed.ipynb \
             --ExecutePreprocessor.timeout=3600

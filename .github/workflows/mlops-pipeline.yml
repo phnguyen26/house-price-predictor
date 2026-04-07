@@ -19,11 +19,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11.15"
-          # cache: pip
-          # cache-dependency-path: |
-          #   requirements.txt
-          #   src/api/requirements.txt
-          #   streamlit_app/requirements.txt
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            src/api/requirements.txt
+            streamlit_app/requirements.txt
 
       - name: Install Python dependencies
         run: |
@@ -67,9 +67,9 @@ jobs:
       - name: Execute experimentation notebook
         run: |
           jupyter nbconvert \
-            -- to notebook \
+            --to notebook \
             --execute notebooks/03_experimentation.ipynb \
-            --output 03_experimentation.executed.ipynb \
+            --output 03_experimentation.executed \
             --ExecutePreprocessor.timeout=3600
 
       - name: Train model script
@@ -81,7 +81,11 @@ jobs:
             --mlflow-tracking-uri http://localhost:5555
 
       - name: Build FastAPI Docker image
-        run: docker build -t house-price-api:ci -f Dockerfile .
+        run: |
+          pip install -r src\api\requirements.txt
+          docker build -t house-price-api:ci -f Dockerfile .
 
       - name: Build Streamlit Docker image
-        run: docker build -t house-price-streamlit:ci -f streamlit_app/Dockerfile .
+        run: |
+          pip install -r streamlit_app\requirements.txt
+          docker build -t house-price-streamlit:ci -f streamlit_app/Dockerfile .

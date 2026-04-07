@@ -39,8 +39,9 @@ jobs:
             --preprocessor models/trained/preprocessor.pkl
 
       - name: Start MLflow tracking server
-        run: docker run -d -p 5555:5000 --name mlflow-server ghcr.io/mlflow/mlflow:latest \
+        run: docker run -d -p 5555:5555 --name mlflow-server ghcr.io/mlflow/mlflow:latest \
           mlflow server --host 0.0.0.0 \
+          --port 5555 \
           --backend-store-uri sqlite:///mlflow.db \
           --default-artifact-root /tmp/mlruns
           #|

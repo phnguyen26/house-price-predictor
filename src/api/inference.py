@@ -7,7 +7,7 @@ from schemas import HousePredictionRequest, PredictionResponse
 # Load model and preprocessor
 MODEL_PATH = "models/trained/house_price_model.pkl"
 PREPROCESSOR_PATH = "models/trained/preprocessor.pkl"
-model_config = yaml.safe_load(open("config/model_config.yaml"))
+# model_config = yaml.safe_load(open("config/model_config.yaml"))
 try:
     model = joblib.load(MODEL_PATH)
     preprocessor = joblib.load(PREPROCESSOR_PATH)

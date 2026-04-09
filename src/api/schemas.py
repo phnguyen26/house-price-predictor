@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Any
 
 class HousePredictionRequest(BaseModel):
     sqft: float = Field(..., gt=0, description="Square footage of the house")
@@ -14,3 +14,5 @@ class PredictionResponse(BaseModel):
     confidence_interval: List[float]
     features_importance: dict
     prediction_time: str
+    model_used: Any
+    r2_score: float

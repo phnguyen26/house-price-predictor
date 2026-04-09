@@ -7,7 +7,7 @@ from schemas import HousePredictionRequest, PredictionResponse
 # Load model and preprocessor
 MODEL_PATH = "models/trained/house_price_model.pkl"
 PREPROCESSOR_PATH = "models/trained/preprocessor.pkl"
-# model_config = yaml.safe_load(open("config/model_config.yaml"))
+model_config = yaml.safe_load(open("configs/model_config.yaml")).get('model')
 try:
     model = joblib.load(MODEL_PATH)
     preprocessor = joblib.load(PREPROCESSOR_PATH)
@@ -22,7 +22,6 @@ def predict_price(request: HousePredictionRequest) -> PredictionResponse:
     input_data = pd.DataFrame([request.dict()])
     input_data['house_age'] = datetime.now().year - input_data['year_built']
     input_data['bed_bath_ratio'] = input_data['bedrooms'] / input_data['bathrooms']
-    input_data['price_per_sqft'] = 0  # Dummy value for compatibility
 
     # Preprocess input data
     processed_features = preprocessor.transform(input_data)

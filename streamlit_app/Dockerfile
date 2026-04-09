@@ -2,7 +2,7 @@ FROM python:3.11.15-slim
 
 WORKDIR /app
 
-COPY streamlit_app/ .
+COPY . .
 
 RUN pip install -r requirements.txt
 
